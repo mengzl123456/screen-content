@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 func ScreenContentBySeparator(w http.ResponseWriter, r *http.Request) {
@@ -58,12 +59,27 @@ func screenContent(path string, savePath string, separator []string) error {
 			if err != nil {
 				return err
 			}
-			fmt.Println(string(content))
+
+			fmt.Println(screenContentByTwoSeparator(string(content), separator[0]))
 		}
 	}
 	return nil
 }
 
-func screenContentByOneSeparator(content string, separator string) {
-	//strings.s
+func screenContentByOneSeparator(content string, separator string) string {
+	contentArr := strings.Split(content, separator)
+	return contentArr[1]
+}
+
+func screenContentByTwoSeparator(content string, separator string) *string {
+
+	contentArr := strings.Split(content, separator)
+	for _, contentTmp := range contentArr {
+		if strings.Contains(contentTmp, separator) {
+			return &strings.Split(contentTmp, separator)[0]
+		}
+	}
+
+	return nil
+
 }
