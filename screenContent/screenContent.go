@@ -22,17 +22,25 @@ func ScreenContentBySeparator(w http.ResponseWriter, r *http.Request) {
 	form := r.Form
 	path := form.Get("path")
 	savePath := form.Get("savePath")
-	separator := make([]string, 2)
+	separator := make([]string, 1, 2)
 	separator[0] = form.Get("firstSeparator")
-	separator[1] = form.Get("secondSeparator")
+	secondSeparator := form.Get("secondSeparator")
+	if secondSeparator != "" {
+		separator = append(separator, secondSeparator)
+	}
+	_, err = io.WriteString(w, "<br>正在处理中请稍等</br>")
+	w.(http.Flusher).Flush()
+	if err != nil {
+		log.Fatal(err)
+	}
 	err = screenContent(path, savePath, separator)
 	if err != nil {
-		_, _ = fmt.Fprintf(w, "文件错误")
+		_, _ = fmt.Fprintf(w, "<br>文件错误</br>")
 		w.(http.Flusher).Flush()
-		_, _ = fmt.Fprintf(w, "文件错误")
+		log.Fatal(err)
 		return
 	}
-	_, err = io.WriteString(w, "正在生成文件请稍等")
+	_, err = io.WriteString(w, "<br>处理完成</br>")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -46,10 +54,13 @@ func screenContent(path string, savePath string, separator []string) error {
 	}
 	for i := 0; i < len(directory); i++ {
 		if directory[i].IsDir() {
-			savePath += string(filepath.Separator) + directory[i].Name()
-			path += string(filepath.Separator) + directory[i].Name()
-			_ = os.Mkdir(savePath, os.ModePerm)
-			_ = screenContent(path, savePath, separator)
+			savePathTemp := savePath + string(filepath.Separator) + directory[i].Name()
+			pathTemp := path + string(filepath.Separator) + directory[i].Name()
+			_ = os.Mkdir(savePathTemp, os.ModePerm)
+			err = screenContent(pathTemp, savePathTemp, separator)
+			if err != nil {
+				return err
+			}
 		} else {
 			file, err := os.Open(path + string(filepath.Separator) + directory[i].Name())
 			if err != nil {
@@ -59,8 +70,19 @@ func screenContent(path string, savePath string, separator []string) error {
 			if err != nil {
 				return err
 			}
-
-			fmt.Println(screenContentByTwoSeparator(string(content), separator[0]))
+			if len(separator) == 1 {
+				fmt.Println(screenContentByOneSeparator(string(content), separator[0]))
+				err = ioutil.WriteFile(savePath+string(filepath.Separator)+directory[i].Name(), []byte(screenContentByOneSeparator(string(content), separator[0])), 0777)
+				if err != nil {
+					return err
+				}
+			} else {
+				fmt.Println(screenContentByTwoSeparator(string(content), separator))
+				err = ioutil.WriteFile(savePath+string(filepath.Separator)+directory[i].Name(), []byte(screenContentByTwoSeparator(string(content), separator)), 0777)
+				if err != nil {
+					return err
+				}
+			}
 		}
 	}
 	return nil
@@ -71,15 +93,14 @@ func screenContentByOneSeparator(content string, separator string) string {
 	return contentArr[1]
 }
 
-func screenContentByTwoSeparator(content string, separator string) *string {
+func screenContentByTwoSeparator(content string, separator []string) string {
 
-	contentArr := strings.Split(content, separator)
+	contentArr := strings.Split(content, separator[0])
 	for _, contentTmp := range contentArr {
-		if strings.Contains(contentTmp, separator) {
-			return &strings.Split(contentTmp, separator)[0]
+		if strings.Contains(contentTmp, separator[1]) {
+			return strings.Split(contentTmp, separator[1])[0]
 		}
 	}
 
-	return nil
-
+	return ""
 }

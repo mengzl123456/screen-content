@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 	"net/http"
 	"screen-content/screenContent"
@@ -18,6 +19,7 @@ func main() {
 	http.Handle("/", http.FileServer(http.Dir("html/")))
 	err := http.ListenAndServe(":8082", nil)
 	if err != nil {
+		fmt.Println()
 		log.Fatal(err)
 	}
 }

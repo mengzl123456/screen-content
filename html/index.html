@@ -66,7 +66,7 @@
 
 </style>
 <body>
-<form autocomplete="off" action="/screenContentByOneSeparator" method="get">
+<form autocomplete="off" action="/screenContentByOneSeparator" method="post">
     <div class="input-assembly">
         <label>文件路径</label>
         <input id="path" name="path" >
@@ -77,11 +77,11 @@
     </div>
     <div class="input-assembly">
         <label>上分割符</label>
-        <input id="firstSeparator" >
+        <input id="firstSeparator" name="firstSeparator" >
     </div>
     <div class="input-assembly">
         <label>下分割符</label>
-        <input id="secondSeparator" >
+        <input id="secondSeparator" name="secondSeparator" >
     </div>
     <div class="btn-group">
         <button>确定</button>
