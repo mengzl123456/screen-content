@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"screen-content/screenContent"
+	"scree-content/screenContent"
 )
 
 func init() {
@@ -17,7 +17,7 @@ func main() {
 	//http.Handle("/",http.FileServer(http.Dir("html/index.html")))
 	http.HandleFunc("/screenContentByOneSeparator", screenContent.ScreenContentBySeparator)
 	http.Handle("/", http.FileServer(http.Dir("html/")))
-	err := http.ListenAndServe(":8082", nil)
+	err := http.ListenAndServe(":8089", nil)
 	if err != nil {
 		fmt.Println()
 		log.Fatal(err)
