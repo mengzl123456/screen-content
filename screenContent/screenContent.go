@@ -83,6 +83,10 @@ func screenContent(path string, savePath string, separator []string) error {
 					return err
 				}
 			}
+			err = file.Close()
+			if err != nil {
+				return err
+			}
 		}
 	}
 	return nil
