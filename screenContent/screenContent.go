@@ -28,6 +28,8 @@ func ScreenContentBySeparator(w http.ResponseWriter, r *http.Request) {
 	if secondSeparator != "" {
 		separator = append(separator, secondSeparator)
 	}
+	_, err = io.WriteString(w, "<a href='/'>返回</a>")
+	w.(http.Flusher).Flush()
 	_, err = io.WriteString(w, "<br>正在处理中请稍等</br>")
 	w.(http.Flusher).Flush()
 	if err != nil {
